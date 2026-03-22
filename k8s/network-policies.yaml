@@ -1,0 +1,133 @@
+# =============================================================
+# Default DENY-ALL for mlflow namespace
+# =============================================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: mlflow
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+# Allow ingress-nginx to reach mlflow
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-to-mlflow
+  namespace: mlflow
+spec:
+  podSelector:
+    matchLabels:
+      app: mlflow
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          app.kubernetes.io/name: ingress-nginx
+    ports:
+    - port: 5000
+---
+# Allow jupyter-ml namespace to reach mlflow server
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-jupyter-to-mlflow
+  namespace: mlflow
+spec:
+  podSelector:
+    matchLabels:
+      app: mlflow
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          app.kubernetes.io/name: jupyter-ml
+    ports:
+    - port: 5000
+---
+# Allow mlflow server to reach postgres
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-mlflow-to-postgres
+  namespace: mlflow
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: mlflow
+    ports:
+    - port: 5432
+---
+# Allow mlflow server to reach minio
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-mlflow-to-minio
+  namespace: mlflow
+spec:
+  podSelector:
+    matchLabels:
+      app: minio
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: mlflow
+    ports:
+    - port: 9000
+---
+# Allow ml-serving namespace to reach mlflow
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-serving-to-mlflow
+  namespace: mlflow
+spec:
+  podSelector:
+    matchLabels:
+      app: mlflow
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          app.kubernetes.io/name: ml-serving
+    ports:
+    - port: 5000
+---
+# Allow airflow namespace to reach mlflow
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-airflow-to-mlflow
+  namespace: mlflow
+spec:
+  podSelector:
+    matchLabels:
+      app: mlflow
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          app.kubernetes.io/name: airflow
+    ports:
+    - port: 5000

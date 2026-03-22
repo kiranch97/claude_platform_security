@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vault-pvc
+  namespace: vault
+  labels:
+    app: vault
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-config
+  namespace: vault
+data:
+  vault.hcl: |
+    storage "file" {
+      path = "/vault/data"
+    }
+    listener "tcp" {
+      address     = "0.0.0.0:8200"
+      tls_disable = 1
+    }
+    api_addr = "http://0.0.0.0:8200"
+    ui = true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault
+  namespace: vault
+  labels:
+    app: vault
+    project: claude-platform-security
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vault
+  template:
+    metadata:
+      labels:
+        app: vault
+    spec:
+      securityContext:
+        runAsUser: 0
+      containers:
+      - name: vault
+        image: hashicorp/vault:1.15
+        args: [server, -dev]
+        ports:
+        - containerPort: 8200
+          name: api
+        env:
+        - name: VAULT_DEV_ROOT_TOKEN_ID
+          value: root
+        - name: VAULT_DEV_LISTEN_ADDRESS
+          value: 0.0.0.0:8200
+        - name: VAULT_ADDR
+          value: http://127.0.0.1:8200
+        securityContext:
+          capabilities:
+            add: [IPC_LOCK]
+        volumeMounts:
+        - name: vault-storage
+          mountPath: /vault/data
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        readinessProbe:
+          httpGet:
+            path: /v1/sys/health
+            port: 8200
+          initialDelaySeconds: 10
+          periodSeconds: 10
+      volumes:
+      - name: vault-storage
+        persistentVolumeClaim:
+          claimName: vault-pvc
+---
+# ClusterIP service for in-cluster access
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault
+  namespace: vault
+  labels:
+    app: vault
+spec:
+  selector:
+    app: vault
+  ports:
+  - name: api
+    port: 8200
+    targetPort: 8200
+---
+# NodePort for external UI access
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault-nodeport
+  namespace: vault
+  labels:
+    app: vault
+spec:
+  type: NodePort
+  selector:
+    app: vault
+  ports:
+  - name: api
+    port: 8200
+    targetPort: 8200
+    nodePort: 30200
+---
+# Ingress for vault.local
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vault-ingress
+  namespace: vault
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: vault.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vault
+            port:
+              number: 8200

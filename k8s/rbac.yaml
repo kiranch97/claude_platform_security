@@ -1,0 +1,107 @@
+# =============================================================
+# RBAC: data-scientist role (read-only access in jupyter-ml)
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: data-scientist
+  namespace: jupyter-ml
+  labels:
+    project: claude-platform-security
+rules:
+- apiGroups: [""]
+  resources: [pods, pods/log, services]
+  verbs: [get, list, watch]
+- apiGroups: [""]
+  resources: [configmaps]
+  verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: data-scientist-binding
+  namespace: jupyter-ml
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: data-scientist
+subjects:
+- kind: Group
+  name: data-scientists
+  apiGroup: rbac.authorization.k8s.io
+---
+# =============================================================
+# RBAC: ml-engineer role (full access in mlflow + ml-serving)
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ml-engineer
+  namespace: mlflow
+  labels:
+    project: claude-platform-security
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ml-engineer-binding
+  namespace: mlflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ml-engineer
+subjects:
+- kind: Group
+  name: ml-engineers
+  apiGroup: rbac.authorization.k8s.io
+---
+# =============================================================
+# RBAC: pipeline-runner role (full access in airflow)
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pipeline-runner
+  namespace: airflow
+  labels:
+    project: claude-platform-security
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pipeline-runner-binding
+  namespace: airflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pipeline-runner
+subjects:
+- kind: Group
+  name: ml-engineers
+  apiGroup: rbac.authorization.k8s.io
+---
+# =============================================================
+# RBAC: platform-admin ClusterRole
+# =============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: platform-admin-binding
+  labels:
+    project: claude-platform-security
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: Group
+  name: platform-admins
+  apiGroup: rbac.authorization.k8s.io
