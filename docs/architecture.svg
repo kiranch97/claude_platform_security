@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" font-family="Arial, sans-serif">
+  <rect width="900" height="500" fill="#f8f9fa" rx="8"/>
+  <text x="450" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#1e1e1e">claude_platform_security — Platform Security</text>
+  <text x="450" y="48" text-anchor="middle" font-size="12" fill="#6c757d">HashiCorp Vault + Network Policies + RBAC on Kubernetes</text>
+  <rect x="50" y="75" width="380" height="190" fill="#ffc9c9" rx="8" stroke="#ef4444" stroke-width="2"/>
+  <text x="240" y="100" text-anchor="middle" font-size="14" font-weight="bold" fill="#7f1d1d">HashiCorp Vault</text>
+  <text x="240" y="117" text-anchor="middle" font-size="11" fill="#7f1d1d">hashicorp/vault:1.15 | NodePort: 30200</text>
+  <rect x="70" y="127" width="340" height="28" fill="#ffd8a8" rx="4"/>
+  <text x="240" y="146" text-anchor="middle" font-size="11" fill="#713f12">Secrets Engine: KV v2</text>
+  <rect x="70" y="162" width="155" height="28" fill="white" rx="4" stroke="#ef4444"/>
+  <text x="147" y="180" text-anchor="middle" font-size="11" fill="#7f1d1d">mlflow/db-password</text>
+  <rect x="237" y="162" width="155" height="28" fill="white" rx="4" stroke="#ef4444"/>
+  <text x="314" y="180" text-anchor="middle" font-size="11" fill="#7f1d1d">minio/access-key</text>
+  <rect x="70" y="197" width="155" height="28" fill="white" rx="4" stroke="#ef4444"/>
+  <text x="147" y="215" text-anchor="middle" font-size="11" fill="#7f1d1d">jupyter/token</text>
+  <rect x="237" y="197" width="155" height="28" fill="white" rx="4" stroke="#ef4444"/>
+  <text x="314" y="215" text-anchor="middle" font-size="11" fill="#7f1d1d">postgres/password</text>
+  <text x="240" y="252" text-anchor="middle" font-size="11" fill="#0f766e">K8s Auth | Namespace: vault | PVC: 5Gi</text>
+  <rect x="470" y="75" width="380" height="190" fill="#d0bfff" rx="8" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="660" y="100" text-anchor="middle" font-size="14" font-weight="bold" fill="#2d1b69">Network Policies</text>
+  <text x="660" y="117" text-anchor="middle" font-size="11" fill="#2d1b69">Zero-trust networking between namespaces</text>
+  <rect x="490" y="127" width="340" height="28" fill="#e5dbff" rx="4"/>
+  <text x="660" y="146" text-anchor="middle" font-size="11" fill="#2d1b69">Default: DENY ALL ingress/egress</text>
+  <rect x="490" y="162" width="340" height="24" fill="white" rx="4" stroke="#8b5cf6"/>
+  <text x="660" y="178" text-anchor="middle" font-size="11" fill="#2d1b69">Allow: jupyter-ml to mlflow port 5000</text>
+  <rect x="490" y="192" width="340" height="24" fill="white" rx="4" stroke="#8b5cf6"/>
+  <text x="660" y="208" text-anchor="middle" font-size="11" fill="#2d1b69">Allow: mlflow to postgres port 5432</text>
+  <rect x="490" y="222" width="340" height="24" fill="white" rx="4" stroke="#8b5cf6"/>
+  <text x="660" y="238" text-anchor="middle" font-size="11" fill="#2d1b69">Allow: ml-serving to mlflow port 5000</text>
+  <rect x="50" y="285" width="380" height="120" fill="#b2f2bb" rx="8" stroke="#22c55e" stroke-width="2"/>
+  <text x="240" y="308" text-anchor="middle" font-size="14" font-weight="bold" fill="#14532d">RBAC Roles</text>
+  <rect x="70" y="318" width="340" height="25" fill="#d3f9d8" rx="4"/>
+  <text x="240" y="335" text-anchor="middle" font-size="11" fill="#14532d">data-scientist: get/list pods in jupyter-ml</text>
+  <rect x="70" y="349" width="340" height="25" fill="#d3f9d8" rx="4"/>
+  <text x="240" y="366" text-anchor="middle" font-size="11" fill="#14532d">ml-engineer: full access in mlflow, ml-serving</text>
+  <rect x="70" y="380" width="340" height="20" fill="#d3f9d8" rx="4"/>
+  <text x="240" y="394" text-anchor="middle" font-size="11" fill="#14532d">platform-admin: cluster-admin</text>
+  <rect x="470" y="285" width="380" height="120" fill="#fff3bf" rx="8" stroke="#f59e0b" stroke-width="2"/>
+  <text x="660" y="308" text-anchor="middle" font-size="14" font-weight="bold" fill="#713f12">Pod Security Standards</text>
+  <rect x="490" y="318" width="340" height="25" fill="#ffd8a8" rx="4"/>
+  <text x="660" y="335" text-anchor="middle" font-size="11" fill="#713f12">runAsNonRoot: true</text>
+  <rect x="490" y="349" width="340" height="25" fill="#ffd8a8" rx="4"/>
+  <text x="660" y="366" text-anchor="middle" font-size="11" fill="#713f12">readOnlyRootFilesystem: true</text>
+  <rect x="490" y="380" width="340" height="20" fill="#ffd8a8" rx="4"/>
+  <text x="660" y="394" text-anchor="middle" font-size="11" fill="#713f12">capabilities: drop ALL</text>
+  <rect x="50" y="422" width="800" height="50" fill="#dbe4ff" rx="5" stroke="#4a9eed"/>
+  <text x="450" y="444" text-anchor="middle" font-size="12" font-weight="bold" fill="#2563eb">Vault UI: http://localhost:30200 | Token: root</text>
+  <text x="450" y="462" text-anchor="middle" font-size="11" fill="#2563eb">K8s ServiceAccounts authenticate via Vault K8s Auth Method</text>
+</svg>
